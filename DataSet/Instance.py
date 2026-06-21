@@ -9,6 +9,8 @@ Breakdowns: Sự kiện máy hỏng đột xuất
 Due_Dates: Ngày hạn định hoàn thành cho từng Job
 """
 
+import random
+
 # LOẠI 1: Quy trình gồm 5 công đoạn (Tương thích 20 máy)
 CKS_Type1 = [
     [10, 9, 15, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 12, 9999, 9999, 9999, 18, 9999, 9999, 9999, 9999, 9999],
@@ -47,9 +49,12 @@ CKS_Type3 = [
 # ==========================================
 # CÁC KỊCH BẢN THỰC NGHIỆM (SCENARIOS)
 # ==========================================
-# Thay đổi giá trị SCENARIO (1 -> 6) để chạy các bộ dữ liệu khác nhau
-SCENARIO = 3
+# Thay đổi giá trị SCENARIO (1 -> 9) để chạy các bộ dữ liệu khác nhau
+SCENARIO = 8
 
+# =========================================================================
+# NHÓM 1: ĐÁNH GIÁ CƠ SỞ VÀ KHẢ NĂNG MỞ RỘNG QUY MÔ (KỊCH BẢN 1–3)
+# =========================================================================
 if SCENARIO == 1:
     # ---------------------------------------------------------
     # KỊCH BẢN 1: QUY MÔ NHỎ & TĨNH (BASELINE)
@@ -110,6 +115,9 @@ elif SCENARIO == 3:
     ]
     Due_Dates = [100, 110, 120, 130, 140, 160, 180, 200, 220, 250, 280, 300, 320, 350, 380]
 
+# =========================================================================
+# NHÓM 2: ĐÁNH GIÁ KHẢ NĂNG PHẢN ỨNG TRƯỚC RỦI RO ĐẶC THÙ (KỊCH BẢN 4–6)
+# =========================================================================
 elif SCENARIO == 4:
     # ---------------------------------------------------------
     # KỊCH BẢN 4: THẮT NÚT CỔ CHAI (BOTTLENECK)
@@ -136,10 +144,10 @@ elif SCENARIO == 4:
 elif SCENARIO == 5:
     # ---------------------------------------------------------
     # KỊCH BẢN 5: ĐƠN HÀNG KHẨN CẤP (URGENT ORDERS)
-    # Đặc điểm: 15 Job đến dồn dập, Due Dates cực ngắn.
+    # Đặc điểm: 12 Job đến dồn dập, Due Dates cực ngắn.
     # Mục tiêu: Xem thuật toán hi sinh Cmax để cứu Tardiness như thế nào.
     # ---------------------------------------------------------
-    J_num = 12
+    J_num = 2
     M_num = 20
     Processing_time = [CKS_Type1] * 4 + [CKS_Type2] * 4 + [CKS_Type3] * 4
     J = {i: (5 if i <= 4 else (8 if i <= 8 else 10)) for i in range(1, J_num + 1)}
@@ -175,3 +183,85 @@ elif SCENARIO == 6:
         {'machine': 19, 'start': 120, 'duration': 25}
     ]
     Due_Dates = [300] * J_num
+
+# =========================================================================
+# NHÓM 3: ĐÁNH GIÁ GIỚI HẠN CHỊU TẢI VÀ ĐỘ BỀN BỈ QUY MÔ CÔNG NGHIỆP (KỊCH BẢN 7–9)
+# =========================================================================
+elif SCENARIO == 7:
+    # ---------------------------------------------------------
+    # KỊCH BẢN 7: QUY MÔ CÔNG NGHIỆP TĨNH (100 JOBS BASELINE)
+    # Đặc điểm: Số lượng công việc rất lớn (100 Jobs), các Job phân
+    # phối ngẫu nhiên theo tỷ lệ Type1:Type2:Type3 = 4:4:2.
+    # Mục đích: Đánh giá hiệu năng tính toán và khả năng tối ưu toàn cục
+    # của GA/Hybrid trong môi trường tĩnh quy mô lớn (Tất cả Job đến ở t=0).
+    # ---------------------------------------------------------
+    random.seed(101)
+    J_num = 100
+    M_num = 20
+    Job_types = random.choices([1, 2, 3], weights=[0.4, 0.4, 0.2], k=J_num)
+    Processing_time, J = [], {}
+    for i, t in enumerate(Job_types):
+        if t == 1: Processing_time.append(CKS_Type1); J[i+1] = 5
+        elif t == 2: Processing_time.append(CKS_Type2); J[i+1] = 8
+        else: Processing_time.append(CKS_Type3); J[i+1] = 10
+    O_num = sum(J.values())
+
+    Arrival_Time = [0] * J_num # Tất cả công việc đều có mặt từ đầu
+    Breakdowns = []
+    Due_Dates = [J[i+1] * random.randint(30, 60) for i in range(J_num)]
+
+elif SCENARIO == 8:
+    # ---------------------------------------------------------
+    # KỊCH BẢN 8
+    # Đặc điểm: 120 Jobs xuất hiện rải rác từ t=0 đến t=3000. Đi kèm
+    # với 15 sự cố hỏng máy ngẫu nhiên kéo dài (từ 50-150 đơn vị thời gian).
+    # Tỷ lệ loại Job phân bổ đồng đều hơn (3:4:3).
+    # Mục đích: Thử thách thuật toán tái lập lịch động (Dynamic Scheduling)
+    # và chiến lược chèn vị trí trống trong một chuỗi sự kiện dày đặc.
+    # ---------------------------------------------------------
+    random.seed(102)
+    J_num = 120
+    M_num = 20
+    Job_types = random.choices([1, 2, 3], weights=[0.3, 0.4, 0.3], k=J_num)
+    Processing_time, J = [], {}
+    for i, t in enumerate(Job_types):
+        if t == 1: Processing_time.append(CKS_Type1); J[i+1] = 5
+        elif t == 2: Processing_time.append(CKS_Type2); J[i+1] = 8
+        else: Processing_time.append(CKS_Type3); J[i+1] = 10
+    O_num = sum(J.values())
+
+    Arrival_Time = sorted([random.randint(0, 3000) for _ in range(J_num)])
+    Due_Dates = [Arrival_Time[i] + J[i+1] * random.randint(40, 80) for i in range(J_num)]
+    Breakdowns = [
+        {'machine': random.randint(0, M_num - 1),
+         'start': random.randint(500, 4000),
+         'duration': random.randint(50, 150)} for _ in range(15)
+    ]
+
+elif SCENARIO == 9:
+    # ---------------------------------------------------------
+    # KỊCH BẢN 9
+    # Đặc điểm: Quy mô stress-test cao nhất với 150 Jobs (Xấp xỉ hơn 1000 công đoạn).
+    # Thời gian Job đến kéo dài tới t=5000; Tỷ lệ Job phức tạp rất cao (50% Type2, 30% Type3).
+    # Đồng thời xưởng chịu 25 đợt hỏng máy có thể kéo dài lên tới 300 đơn vị thời gian.
+    # Mục đích: Đánh giá giới hạn chịu tải, tốc độ hội tụ và độ ổn định bền vững
+    # (Robustness) của mô hình lai (Hybrid) trong điều kiện vận hành khắc nghiệt nhất.
+    # ---------------------------------------------------------
+    random.seed(103)
+    J_num = 150
+    M_num = 20
+    Job_types = random.choices([1, 2, 3], weights=[0.2, 0.5, 0.3], k=J_num)
+    Processing_time, J = [], {}
+    for i, t in enumerate(Job_types):
+        if t == 1: Processing_time.append(CKS_Type1); J[i+1] = 5
+        elif t == 2: Processing_time.append(CKS_Type2); J[i+1] = 8
+        else: Processing_time.append(CKS_Type3); J[i+1] = 10
+    O_num = sum(J.values())
+
+    Arrival_Time = sorted([random.randint(0, 5000) for _ in range(J_num)])
+    Due_Dates = [Arrival_Time[i] + J[i+1] * random.randint(30, 100) for i in range(J_num)]
+    Breakdowns = [
+        {'machine': random.randint(0, M_num - 1),
+         'start': random.randint(1000, 6000),
+         'duration': random.randint(100, 300)} for _ in range(25)
+    ]

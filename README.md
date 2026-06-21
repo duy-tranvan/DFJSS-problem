@@ -44,16 +44,20 @@ Dựa vào tham số `Pw`, thuật toán chọn:
 - **Operation Mutation (5%):** Chọn một nhóm nhỏ các Job (2-4 Job) và thực hiện hoán vị (Permutation) để tìm ra thứ tự tốt nhất (nhằm tránh bùng nổ tổ hợp).
 
 ### D. Phương pháp Chọn lọc (Selection)
-- Sử dụng chiến lược **Cạnh tranh (Competition)**: Con lai được tạo ra sẽ so sánh độ thích nghi (`fitness`) với chính cha mẹ của nó và các biến thể đột biến. Chỉ cá thể có giá trị `Makespan` nhỏ nhất được giữ lại cho thế hệ sau.
+- Sử dụng chiến lược **Cạnh tranh (Competition)**: Con lai được tạo ra sẽ so sánh độ thích nghi (`Fitness`) với chính cha mẹ của nó và các biến thể đột biến. Chỉ cá thể có giá trị `Fitness` nhỏ nhất được giữ lại cho thế hệ sau.
 
 ---
 
 ## 4. Các Yếu tố Động và Giải mã (Dynamic & Decoding)
 - **Sự kiện Máy hỏng (Machine Breakdowns):** Có 5 sự kiện hỏng máy được mô phỏng. Thời gian máy hỏng được "đóng băng" trong biểu đồ Gantt (ký hiệu X màu đen).
-- **Thời gian đến (Arrival Time):** Các công việc đến theo các đợt ($t=0, 25, 50, 80$).
+- **Thời gian đến (Arrival Time):** Các công việc đến theo các đợt ($t_1, t_2,... t_n$).
 - **Chiến lược Giải mã (Decoding):** Sử dụng **Active Scheduling** với cơ chế chèn (Insertion). Thuật toán tìm kiếm các "khoảng trống" (time windows) giữa các công đoạn đã xếp lịch hoặc sau khi sửa máy để chèn công đoạn mới vào, giúp giảm tối đa thời gian trống.
 
 ---
 
 ## 5. Hàm mục tiêu (Objective)
-- **Tối thiểu hóa Makespan ($C_{max}$):** Tổng thời gian từ khi bắt đầu cho đến khi công việc cuối cùng kết thúc.
+- **Hàm mục tiêu tối ưu** cho bài toán với hai mục tiêu được sử dụng là $Fitness = \alpha\times C_{max} + \beta \times Tardiness$
+### Trong đó:
+- **Makespan ($C_{max}$):** Tổng thời gian từ khi bắt đầu cho đến khi công việc cuối cùng kết thúc.
+- **Tardiness :** Tổng thời gian từ khi bắt đầu cho đến khi công việc cuối cùng kết thúc.
+- 

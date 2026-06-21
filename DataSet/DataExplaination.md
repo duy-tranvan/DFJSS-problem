@@ -52,8 +52,10 @@ O_num = 25
 
 ## 3. Các kịch bản thực nghiệm (Experimental Scenarios)
 
-Hệ thống cung cấp 6 kịch bản thực nghiệm để kiểm chứng khả năng thích ứng của thuật toán trong các điều kiện khác nhau:
+Hệ thống cung cấp 12 kịch bản thực nghiệm  để kiểm chứng khả năng thích ứng của thuật toán trong các điều kiện khác nhau:
 
+
+### Kịch bản 1-6: 
 | Kịch bản | Đặc điểm | Mục tiêu kiểm thử |
 | :--- | :--- | :--- |
 | **Scenario 1** | Quy mô nhỏ & Tĩnh | Kiểm tra tính đúng đắn cơ bản và hiển thị biểu đồ Gantt. |
